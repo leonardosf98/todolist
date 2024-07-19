@@ -5,9 +5,13 @@
             <li v-for="task in tasks" :key="task.id">
                 <h2>{{ task.title }}</h2>
                 <p>{{ task.description }}</p>
-                <p>Deadline: {{ new Date(task.deadLine).toLocaleDateString() }}</p>
+                <p>Prazo: {{ new Date(task.deadLine).toLocaleDateString() }}</p>
+                <button>Concluir</button>
+                <button>Editar tarefa</button>
+                <button>Excluir tarefa</button>
             </li>
         </ul>
+        <button>Adicionar tarefa</button>
     </div>
 </template>
 
@@ -25,7 +29,7 @@ export default {
     methods: {
         async getTasks() {
             try {
-                const response = await fetch('http://localhost:8080/api/v1/tasks');
+                const response = await fetch('https://todolist-leonardosf98-6f37cbc708fb.herokuapp.com/api/v1/tasks');
                 const data = await response.json();
                 this.tasks = data.map(task => {
                     return {
