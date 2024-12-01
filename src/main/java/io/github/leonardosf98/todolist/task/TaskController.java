@@ -1,5 +1,6 @@
 package io.github.leonardosf98.todolist.task;
 
+import io.github.leonardosf98.todolist.utils.Utils;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -33,9 +34,30 @@ public class TaskController {
             }
             taskModel.setIdUser((UUID) request.getAttribute("idUser"));
             TaskModel taskToAdd = this.taskRepository.save(taskModel);
-            return ResponseEntity.ok().body("Criado com sucesso\n" + taskToAdd);
+            return ResponseEntity.ok().body(taskToAdd);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity update(@RequestBody TaskModel taskModel, HttpServletRequest request, @PathVariable UUID id) {
+        var idUser = (UUID) request.getAttribute("idUser");
+        var taskToEdit = this.taskRepository.findById(id);
+        System.out.println(taskToEdit);
+        if (idUser.equals(taskModel.getIdUser())) {
+            try {
+                if (taskToEdit == null) {
+                    return ResponseEntity.badRequest().body("Tarefa não encontrada");
+                }
+                Utils.copyNonNullProperties(taskModel, taskToEdit);
+                taskModel.setId(id);
+                this.taskRepository.save(taskModel);
+                return ResponseEntity.ok().build();
+            } catch (Exception e) {
+                return ResponseEntity.internalServerError().build();
+            }
+        }
+        return ResponseEntity.status(401).body("Usuário não autorizado para esta ação.");
     }
 }
